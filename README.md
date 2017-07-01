@@ -2,7 +2,7 @@
 <img src="icon/shield.png" width="128"/>
 </p>
 
-### Paranoid Archimedes
+## Paranoid Archimedes
 A chrome extension for deleting stale cookies.
 
 #### Features
