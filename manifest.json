@@ -1,0 +1,23 @@
+{
+	"name": "Paranoid Archimedes",
+	"version": "0.0.1",
+	"manifest_version": 2,
+	"description": "A chrome extension for a paranoid bubbly life.",
+	"icons": {"48": "icon/shield.png"},
+	"browser_action": {
+		"default_icon": "icon/shield.png",
+		"default_title": "Paranoid Archimedes"
+	},
+	"background": {
+		"scripts": ["background.js"],
+		"persistent": true
+		},
+	"author": "moebit",
+	"permissions": [
+		"tabs",
+		"cookies",
+		"background",
+		"*://*/*",
+		"*://*/*"
+	]
+}
