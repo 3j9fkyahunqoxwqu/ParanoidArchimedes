@@ -6,7 +6,8 @@
 	"icons": {"48": "icon/shield.png"},
 	"browser_action": {
 		"default_icon": "icon/shield.png",
-		"default_title": "Paranoid Archimedes"
+		"default_title": "Paranoid Archimedes",
+		"default_popup": "bubbleUp.html"
 	},
 	"background": {
 		"scripts": ["background.js"],
@@ -17,7 +18,7 @@
 		"tabs",
 		"cookies",
 		"background",
-		"*://*/*",
-		"*://*/*"
+		"storage",
+		"<all_urls>"
 	]
 }
