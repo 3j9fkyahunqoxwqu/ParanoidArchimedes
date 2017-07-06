@@ -1,12 +1,16 @@
 
 //TODO: check incognito
 //      Storage
-//      add more options to popup
-//      maybe? keeping cookies of specific website
+//   -->add more options to popup
+//      subdomain issue?
+//   -->keeping cookies of specific website
+//   -->put each type in its own folder
+//      future: add some stats
+//      replace array with set
 "use strict";
 
 // set running state to true
-chrome.storage.local.set({"running": true});
+chrome.storage.local.set({"running": true, "keep_list": []});
 var isRunning = true;
 
 chrome.browserAction.onClicked.addListener(function(tab){
@@ -17,7 +21,7 @@ chrome.browserAction.onClicked.addListener(function(tab){
 chrome.runtime.onMessage.addListener(
   function(request, sender, sendResponse) {
     //sendResponse({reply: "gotcha"});
-    //set isRunning to false or true
+    //pause or resume?
     isRunning = (request.command == "pause" ? false : request.command == "resume" ? true : null);
   });
 chrome.tabs.onRemoved.addListener(function(){
@@ -25,23 +29,21 @@ chrome.tabs.onRemoved.addListener(function(){
   isRunning ? getTabs() : null;
 });
 
-
-
 function getTabs(){
-  chrome.tabs.query({}, function(tabs){
-    tabs != null ? removeCookies(Array.prototype.map.call(tabs, function(tab) { 
-      return trimURL(new URL(tab.url), true)
-    })) : null;
-  });
+  chrome.tabs.query({}, tabs => 
+    tabs != null ? chrome.storage.local.get(["keep_list"], value => 
+      removeCookies(Array.prototype.map.call(tabs, tab => trimURL(new URL(tab.url), true)).concat(value["keep_list"])))
+    : null);
 }
 
 function removeCookies(tabURLs){
   tabURLs != null ? chrome.cookies.getAll({}, function(cookies) {
+    //cookie belongs to any open tabs? true => keep : false => remove
     cookies != null ? Array.prototype.map.call(cookies, function(cookie){
       //too cruel? welcome to my bubble!
-      !Array.prototype.includes.call(tabURLs, trimURL(new URL('http://' + cookie.domain), true)) ? 
+      !Array.prototype.includes.call(tabURLs, trimURL(new URL('http://' + cookie.domain), true)) ? // &&  
         chrome.cookies.remove({url: isSecure(cookie) + trimURL(new URL('http://' + cookie.domain), false) + cookie.path ,name: cookie.name}) 
-      : null;
+      : console.log("Will not remove --> " + cookie.domain);
     }) : null;
   }) : null;
 }

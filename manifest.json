@@ -10,7 +10,7 @@
 		"default_popup": "bubbleUp.html"
 	},
 	"background": {
-		"scripts": ["background.js"],
+		"scripts": ["js/background.js"],
 		"persistent": true
 		},
 	"author": "moebit",
