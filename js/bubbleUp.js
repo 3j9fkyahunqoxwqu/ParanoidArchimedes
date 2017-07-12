@@ -1,7 +1,7 @@
 
 "use strict";
 
-window.addEventListener('load', function() {
+window.addEventListener('load', () => {
     //get current state from storage
     chrome.storage.local.get(["running"], value => document.getElementById('control-button').innerText = (value['running'] ? "Pause" : "Resume Paranoia"));
     chrome.storage.local.get(["keep_list"], value => value["keep_list"] != null ? 

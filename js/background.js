@@ -3,8 +3,6 @@
 //      Storage
 //   -->add more options to popup
 //      subdomain issue?
-//   -->keeping cookies of specific website
-//   -->put each type in its own folder
 //      future: add some stats
 //      replace array with set
 "use strict";
@@ -13,21 +11,12 @@
 chrome.storage.local.set({"running": true, "keep_list": []});
 var isRunning = true;
 
-chrome.browserAction.onClicked.addListener(function(tab){
-  //popup
-  chrome.tabs.create({url: chrome.extension.getURL('bubbleUp.html'), 'active': true});
-});
-//pause or resume
-chrome.runtime.onMessage.addListener(
-  function(request, sender, sendResponse) {
-    //sendResponse({reply: "gotcha"});
-    //pause or resume?
-    isRunning = (request.command == "pause" ? false : request.command == "resume" ? true : null);
-  });
-chrome.tabs.onRemoved.addListener(function(){
-  //go ahead?   
-  isRunning ? getTabs() : null;
-});
+//popup
+chrome.browserAction.onClicked.addListener(() => { chrome.tabs.create({url: chrome.extension.getURL('bubbleUp.html'), 'active': true}); });
+//sendResponse({reply: "gotcha"});
+//pause or resume?
+chrome.runtime.onMessage.addListener( (request, sender, sendResponse) => { isRunning = (request.command == "pause" ? false : request.command == "resume" ? true : null); });
+chrome.tabs.onRemoved.addListener(() => isRunning ? getTabs() : null );
 
 function getTabs(){
   chrome.tabs.query({}, tabs => 
@@ -37,9 +26,9 @@ function getTabs(){
 }
 
 function removeCookies(tabURLs){
-  tabURLs != null ? chrome.cookies.getAll({}, function(cookies) {
+  tabURLs != null ? chrome.cookies.getAll({}, cookies => {
     //cookie belongs to any open tabs? true => keep : false => remove
-    cookies != null ? Array.prototype.map.call(cookies, function(cookie){
+    cookies != null ? Array.prototype.map.call(cookies, cookie => {
       //too cruel? welcome to my bubble!
       !Array.prototype.includes.call(tabURLs, trimURL(new URL('http://' + cookie.domain), true)) ? // &&  
         chrome.cookies.remove({url: isSecure(cookie) + trimURL(new URL('http://' + cookie.domain), false) + cookie.path ,name: cookie.name}) 
