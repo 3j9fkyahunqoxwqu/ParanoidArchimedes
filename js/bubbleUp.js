@@ -7,10 +7,12 @@ window.addEventListener('load', () => {
     chrome.storage.local.get(["keep_list"], value => value["keep_list"] != null ? 
         chrome.tabs.query({active: true, currentWindow: true}, tabs => tabs != null ? 
             (document.getElementById('keep-this-domain').checked = (value['keep_list'].indexOf(trimURL(new URL(tabs[0].url))) > -1 ? true : false ),
-            document.getElementById('keep_cookie').innerText = trimURL(new URL(tabs[0].url)))
+            document.getElementById('keep-cookie').innerText = trimURL(new URL(tabs[0].url)))
         : null) 
     : null);
-    
+    chrome.storage.local.get(["keep_subdomains"], value => value["keep_subdomains"] != null ? 
+        document.getElementById('keep-subdomains').checked = value["keep_subdomains"] : null);
+
     //eventlisteners
     //if checked true --> add domain to keep_list, else remove it
     document.getElementById('keep-this-domain').addEventListener('change', (e) => 
@@ -18,6 +20,8 @@ window.addEventListener('load', () => {
             saveToStorage("keep_list", trimURL(new URL(tabs[0].url)), true, e.target.checked)));
     // true --> it's running
     document.getElementById('control-button').addEventListener('click', () => chrome.storage.local.get(["running"], value => controlCommand(value["running"])));
+    //if checked true --> keep subdomain cookies
+    document.getElementById('keep-subdomains').addEventListener('change', (e) => saveToStorage("keep_subdomains", e.target.checked, false, false));
 });
 
 //messages => {command: pause/resume}
@@ -33,8 +37,7 @@ function saveToStorage(key, value, isArray, append){
         (isArray ? 
             (chrome.storage.local.get([key], val => (append ? 
                 val[key].push(value) 
-                : val[key].splice(val[key].indexOf(value), 1), 
-            chrome.storage.local.set({[key]: val[key]}))))
+                : val[key].splice(val[key].indexOf(value), 1), chrome.storage.local.set({[key]: val[key]}))))
             : chrome.storage.local.set({[key]: value})
         )
         : null; 
