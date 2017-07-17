@@ -19,6 +19,7 @@
 #div-control-checkbox li{
     display: block;
     float: left;
+    width: 260px;
 }
 
 #div-control-button {
@@ -28,8 +29,8 @@
 }
 
 html {
-    height: 100px;
-    width: 280px;
+    height: 150px;
+    width: 320px;
 }
 
 body {

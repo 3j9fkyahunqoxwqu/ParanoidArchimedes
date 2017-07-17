@@ -2,21 +2,29 @@
 //TODO: check incognito
 //      Storage
 //   -->add more options to popup
-//   -->subdomain issue?
 //      future: add some stats
 //      replace array with set
+//   -->remove Google redirect tracking from Google search
 "use strict";
 
 // set running state to true
-chrome.storage.local.set({"running": true, "keep_list": [], "keep_subdomains": false});
+chrome.storage.local.set({"running": true, "keep_list": [], "keep_subdomains": false, "disable_google_redirect": true},);
 var isRunning = true;
 
 //popup
 chrome.browserAction.onClicked.addListener(() => { chrome.tabs.create({url: chrome.extension.getURL('bubbleUp.html'), 'active': true}); });
 //sendResponse({reply: "gotcha"});
-//pause or resume?
 chrome.runtime.onMessage.addListener( (request, sender, sendResponse) => { isRunning = (request.command == "pause" ? false : request.command == "resume" ? true : null); });
+//pause or resume?
 chrome.tabs.onRemoved.addListener(() => isRunning ? getTabs() : null );
+//disable google redirect
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+  isIn(tab.url, 'www.google.com') && changeInfo.status === 'complete' ?
+  chrome.storage.local.get(["disable_google_redirect"], value => { 
+    value["disable_google_redirect"] ? chrome.tabs.executeScript({file: "js/content_script.js"
+  }) : null})
+  : null;
+});
 
 function getTabs(){
   chrome.tabs.query({}, tabs => 

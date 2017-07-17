@@ -12,6 +12,8 @@ window.addEventListener('load', () => {
     : null);
     chrome.storage.local.get(["keep_subdomains"], value => value["keep_subdomains"] != null ? 
         document.getElementById('keep-subdomains').checked = value["keep_subdomains"] : null);
+    chrome.storage.local.get(["disable_google_redirect"], value => value["disable_google_redirect"] != null ? 
+        document.getElementById('disable-google-redirect').checked = value["disable_google_redirect"] : null);
 
     //eventlisteners
     //if checked true --> add domain to keep_list, else remove it
@@ -22,6 +24,8 @@ window.addEventListener('load', () => {
     document.getElementById('control-button').addEventListener('click', () => chrome.storage.local.get(["running"], value => controlCommand(value["running"])));
     //if checked true --> keep subdomain cookies
     document.getElementById('keep-subdomains').addEventListener('change', (e) => saveToStorage("keep_subdomains", e.target.checked, false, false));
+    //if checked true --> disable Google redirect
+    document.getElementById('disable-google-redirect').addEventListener('change', (e) => saveToStorage("disable_google_redirect", e.target.checked, false, false));
 });
 
 //messages => {command: pause/resume}
