@@ -2,13 +2,13 @@
 //TODO: check incognito
 //      Storage
 //   -->add more options to popup
-//      future: add some stats
+//   -->add some stats
 //      replace array with set
-//   -->remove Google redirect tracking from Google search
+
 "use strict";
 
 // set running state to true
-chrome.storage.local.set({"running": true, "keep_list": [], "keep_subdomains": false, "disable_google_redirect": true},);
+chrome.storage.local.set({"running": true, "keep_list": [], "keep_subdomains": false, "disable_google_redirect": true, "stats": Object()},);
 var isRunning = true;
 
 //popup
@@ -34,14 +34,22 @@ function getTabs(){
 }
 
 function removeCookies(tabURLs, keepSubdomain){
+  var stats_array = [];
   tabURLs != null ? chrome.cookies.getAll({}, cookies => {
     //cookie belongs to any open tabs? true => keep : false => remove
     cookies != null ? Array.prototype.map.call(cookies, cookie => {
       isUseless(tabURLs, cookie.domain, keepSubdomain) ?
-      chrome.cookies.remove({url: isSecure(cookie) + trimURL(new URL('http://' + cookie.domain), false) + cookie.path ,name: cookie.name}) 
+      ( isUseless(stats_array, cookie.domain, false) ? stats_array.push(trimURL(new URL('http://' + cookie.domain), true)) : null,
+      chrome.cookies.remove({url: isSecure(cookie) + trimURL(new URL('http://' + cookie.domain), false) + cookie.path ,name: cookie.name}) )
       : console.log("Will not remove --> " + cookie.domain);
     }) : null;
   }) : null;
+  chrome.storage.local.get(["stats"], value => 
+    Array.prototype.map.call(stats_array, domain => { 
+      domain in value["stats"] ? value["stats"][domain]++ : value["stats"][domain] = 1;
+      chrome.storage.local.set({"stats": value["stats"]});
+    }));
+  chrome.storage.local.get(["stats"], value => console.log(value["stats"])); 
 }
 
 function isUseless(urls, cookieDomain, keepSubdomain){

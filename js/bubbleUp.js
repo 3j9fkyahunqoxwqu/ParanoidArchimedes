@@ -14,6 +14,19 @@ window.addEventListener('load', () => {
         document.getElementById('keep-subdomains').checked = value["keep_subdomains"] : null);
     chrome.storage.local.get(["disable_google_redirect"], value => value["disable_google_redirect"] != null ? 
         document.getElementById('disable-google-redirect').checked = value["disable_google_redirect"] : null);
+    //get stats
+    chrome.storage.local.get(["stats"], value => value["stats"] != null && Object.keys(value["stats"]).length > 0 ?
+        (console.log(value["stats"]),
+        chrome.tabs.query({active: true, currentWindow: true}, tabs => tabs != null ?
+            ( document.getElementById('deleted-domain').innerText = trimURL(new URL(tabs[0].url)),
+                (value["stats"][trimURL(new URL(tabs[0].url))] != undefined ?
+                    document.getElementById('num-delete-this-domain').innerText = value["stats"][trimURL(new URL(tabs[0].url))] + " or " + Math.trunc(value["stats"][trimURL(new URL(tabs[0].url))]*100 / Object.values(value["stats"]).reduce((a, b) => a + b)) + "%"
+                    : null),
+            document.getElementById('num-delete-overall').innerText = Object.values(value["stats"]).reduce((a, b) => a + b)
+            ) : null))
+        : chrome.tabs.query({active: true, currentWindow: true}, tabs => tabs != null ? 
+            document.getElementById('deleted-domain').innerText = trimURL(new URL(tabs[0].url))
+            : null));
 
     //eventlisteners
     //if checked true --> add domain to keep_list, else remove it
@@ -26,6 +39,7 @@ window.addEventListener('load', () => {
     document.getElementById('keep-subdomains').addEventListener('change', (e) => saveToStorage("keep_subdomains", e.target.checked, false, false));
     //if checked true --> disable Google redirect
     document.getElementById('disable-google-redirect').addEventListener('change', (e) => saveToStorage("disable_google_redirect", e.target.checked, false, false));
+    
 });
 
 //messages => {command: pause/resume}

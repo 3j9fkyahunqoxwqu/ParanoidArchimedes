@@ -7,14 +7,41 @@
     <title>Settings</title>
 </head>
 <body>
-    <div id="div-control-button"> 
-        <button type="button" id="control-button"></button> 
-    </div>
-    <ul id="div-control-checkbox">
-        <li><input type="checkbox" id="keep-this-domain"/><label for="keep-this-domain">Keep cookies for </label><strong id="keep-cookie"></strong></li>
-        <li><input type="checkbox" id="keep-subdomains"/><label for="keep-subdomains">Keep subdomain cookies</label></li>
-        <li><input type="checkbox" id="disable-google-redirect"/><label for="disable-google-redirect">Disable Google redirect</label></li>
-    </ul>
+    <table id="tablize">
+        <tr>
+            <td>
+                <div class="div-control-button">
+                    <button type="button" id="control-button"></button>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="diff-tds">
+                <strong>Cookies deleted since install</strong>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <span id="deleted-domain"></span><br />
+                <span  class="stat-numbers" id="num-delete-this-domain">Not Available</span>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <span>Overall<span><br />
+                <span class="stat-numbers" id="num-delete-overall">Not Available</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="diff-tds">
+                <ul id="control-checkbox">
+                    <li><input type="checkbox" id="keep-this-domain"/><label for="keep-this-domain">Keep cookies for </label><strong id="keep-cookie"></strong></li>
+                    <li><input type="checkbox" id="keep-subdomains"/><label for="keep-subdomains">Keep subdomain cookies</label></li>
+                    <li><input type="checkbox" id="disable-google-redirect"/><label for="disable-google-redirect">Disable Google search redirect</label></li>
+                </ul>
+            </td>
+        </tr>
+    </table>
     <!TODO: include storage option>
    </body>
 </html>
