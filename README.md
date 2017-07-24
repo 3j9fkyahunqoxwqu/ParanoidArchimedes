@@ -9,7 +9,7 @@ A chrome extension for deleting stale cookies.
 * All closed-tab cookies are deleted when you close a tab or click on the extension's icon.
 * Option: domain and subdomain cookies of a website can be kept
 * Option: remove Google search results indirection
+* Shows stats for removed cookies
 
 ## TODOs
-* Add usage stats
 * Storage option (if necessary)
