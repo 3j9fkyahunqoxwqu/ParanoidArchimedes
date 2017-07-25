@@ -8,7 +8,8 @@
 "use strict";
 
 // set running state to true
-chrome.storage.local.set({"running": true, "keep_list": [], "keep_subdomains": false, "disable_google_redirect": true, "stats": Object()},);
+chrome.storage.local.set({"running": true, "keep_list": [], "keep_subdomains": false, "disable_google_redirect": true},);
+chrome.storage.local.get(["stats"], value => value["stats"] == null ? chrome.storage.local.set({"stats": Object()}) : null)
 var isRunning = true;
 
 //popup
