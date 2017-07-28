@@ -19,6 +19,7 @@
 		"cookies",
 		"background",
 		"storage",
+		"unlimitedStorage",
 		"<all_urls>"
 	]
 }
