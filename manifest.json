@@ -20,6 +20,8 @@
 		"background",
 		"storage",
 		"unlimitedStorage",
+		"webRequest",
+		"webRequestBlocking",
 		"<all_urls>"
 	]
 }

@@ -2,35 +2,50 @@
 //TODO: check incognito
 //      Storage
 //   -->add more options to popup
-//   -->add some stats
 //      replace array with set
+//   -->remove referer
+//      add secure flag to all https
+//      keep_list: keep cookies even after closing browser? maybe
 
 "use strict";
 
-// set running state to true
-chrome.storage.local.set({"running": true, "keep_list": [], "keep_subdomains": false, "disable_google_redirect": true},);
+// initialize global settings from storage
+chrome.storage.local.set({"running": true, "keep_list": [], "keep_subdomains": false, "disable_google_redirect": true, "remove_referer": true},);
 chrome.storage.local.get(["stats"], value => value["stats"] == null ? chrome.storage.local.set({"stats": Object()}) : null)
 var isRunning = true;
+var keepSubdomains = false
+var disableGoogleRedirect = true;
+var removeReferer = true;
 
 //popup
 chrome.browserAction.onClicked.addListener(() => { chrome.tabs.create({url: chrome.extension.getURL('bubbleUp.html'), 'active': true}); });
-//sendResponse({reply: "gotcha"});
-chrome.runtime.onMessage.addListener( (request, sender, sendResponse) => { isRunning = (request.command == "pause" ? false : request.command == "resume" ? true : null); });
+//communicating with popup --> pause/resume/refreshSettings
+chrome.runtime.onMessage.addListener( (request, sender, sendResponse) => {
+  isRunning = (request.command == "pause" ? false : request.command == "resume" ? true : null); 
+  request.command == "refreshSettings" ? refreshSettings() : null;
+});
+//remove referer --> for now remove all referers --> check usability issues
+chrome.webRequest.onBeforeSendHeaders.addListener( request => {
+  isRunning && removeReferer ? 
+    Array.prototype.map.call(request.requestHeaders, headerItem => headerItem.name == "Referer" ? 
+      request.requestHeaders.splice(request.requestHeaders.indexOf(headerItem), 1) : null)
+  : null;
+  return {requestHeaders: request.requestHeaders};
+}, {urls: ["<all_urls>"]}, ["blocking", "requestHeaders"] );
+
 //pause or resume?
 chrome.tabs.onRemoved.addListener(() => isRunning ? getTabs() : null );
 //disable google redirect
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-  isIn(tab.url, 'www.google.com') && changeInfo.status === 'complete' ?
-  chrome.storage.local.get(["disable_google_redirect"], value => { 
-    value["disable_google_redirect"] ? chrome.tabs.executeScript({file: "js/content_script.js"
-  }) : null})
-  : null;
+  isIn(tab.url, 'www.google.com') && changeInfo.status === 'complete' && isRunning && disableGoogleRedirect ?
+    chrome.tabs.executeScript({file: "js/content_script.js"})
+    : null;
 });
 
 function getTabs(){
   chrome.tabs.query({}, tabs => 
-    tabs != null ? chrome.storage.local.get(["keep_list", "keep_subdomains"], value => 
-      removeCookies(Array.prototype.map.call(tabs, tab => trimURL(new URL(tab.url), true)).concat(value["keep_list"]), value["keep_subdomains"]))
+    tabs != null ? chrome.storage.local.get(["keep_list"], value => 
+      removeCookies(Array.prototype.map.call(tabs, tab => trimURL(new URL(tab.url), true)).concat(value["keep_list"]), keepSubdomains))
     : null);
 }
 
@@ -50,7 +65,16 @@ function removeCookies(tabURLs, keepSubdomain){
       domain in value["stats"] ? value["stats"][domain]++ : value["stats"][domain] = 1;
       chrome.storage.local.set({"stats": value["stats"]});
     }));
-  chrome.storage.local.get(["stats"], value => console.log(value["stats"])); 
+}
+
+function refreshSettings() {
+  chrome.storage.local.get(["running", "keep_subdomains", "disable_google_redirect", "remove_referer"], value => 
+  {
+    isRunning = value["running"];
+    keepSubdomains = value["keep_subdomains"];
+    disableGoogleRedirect = value["disable_google_redirect"];
+    removeReferer = value["remove_referer"];
+  })
 }
 
 function isUseless(urls, cookieDomain, keepSubdomain){
