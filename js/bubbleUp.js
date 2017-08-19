@@ -3,7 +3,7 @@
 
 window.addEventListener('load', () => {
     //get current state from storage
-    chrome.storage.local.get(["running", "keep_list", "keep_subdomains", "disable_google_redirect", "remove_referer"], value => {
+    chrome.storage.local.get(["running", "keep_list", "keep_subdomains", "disable_google_redirect", "disable_twitter_redirect", "remove_referer"], value => {
         //running? 
         document.getElementById('control-button').innerText = (value['running'] ? "Pause" : "Resume Paranoia");
         //keep cookie list?
@@ -14,8 +14,9 @@ window.addEventListener('load', () => {
         : null;
         //keep subdomains?
         value["keep_subdomains"] != null ? document.getElementById('keep-subdomains').checked = value["keep_subdomains"] : null;
-        //disable google redirect?
+        //disable google/twitter redirect?
         value["disable_google_redirect"] != null ? document.getElementById('disable-google-redirect').checked = value["disable_google_redirect"] : null;
+        value["disable_twitter_redirect"] != null ? document.getElementById('disable-twitter-redirect').checked = value["disable_twitter_redirect"] : null;
         //remove referer header?
         value["remove_referer"] != null ? document.getElementById('remove-referer').checked = value["remove_referer"] : null;
     });
@@ -53,6 +54,8 @@ function saveSettings() {
     saveToStorage("keep_subdomains", document.getElementById('keep-subdomains').checked, false, false);  
     //if checked true --> disable Google redirect
     saveToStorage("disable_google_redirect", document.getElementById('disable-google-redirect').checked, false, false); 
+    //if checked true --> disable Twitter redirect
+    saveToStorage("disable_twitter_redirect", document.getElementById('disable-twitter-redirect').checked, false, false); 
     //if checked true --> remove referer
     saveToStorage("remove_referer", document.getElementById('remove-referer').checked, false, false);
     controlCommand("settings");

@@ -3,18 +3,19 @@
 //      Storage
 //   -->add more options to popup
 //      replace array with set
-//   -->remove referer
+//   -->disable twitter link redirect
 //      add secure flag to all https
 //      keep_list: keep cookies even after closing browser? maybe
 
 "use strict";
 
 // initialize global settings from storage
-chrome.storage.local.set({"running": true, "keep_list": [], "keep_subdomains": false, "disable_google_redirect": true, "remove_referer": true},);
+chrome.storage.local.set({"running": true, "keep_list": [], "keep_subdomains": false, "disable_google_redirect": true, "disable_twitter_redirect": true, "remove_referer": true},);
 chrome.storage.local.get(["stats"], value => value["stats"] == null ? chrome.storage.local.set({"stats": Object()}) : null)
 var isRunning = true;
 var keepSubdomains = false
 var disableGoogleRedirect = true;
+var disableTwitterRedirect = true;
 var removeReferer = true;
 
 //popup
@@ -37,7 +38,10 @@ chrome.webRequest.onBeforeSendHeaders.addListener( request => {
 chrome.tabs.onRemoved.addListener(() => isRunning ? getTabs() : null );
 //disable google redirect
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-  isIn(tab.url, 'www.google.com') && changeInfo.status === 'complete' && isRunning && disableGoogleRedirect ?
+  isIn(tab.url, 'www.google.') && changeInfo.status === 'complete' && isRunning && disableGoogleRedirect ?
+    chrome.tabs.executeScript({file: "js/content_script.js"})
+    : null;
+  isIn(tab.url, 'twitter.com') && changeInfo.status === 'complete' && isRunning && disableTwitterRedirect ?
     chrome.tabs.executeScript({file: "js/content_script.js"})
     : null;
 });
@@ -68,11 +72,12 @@ function removeCookies(tabURLs, keepSubdomain){
 }
 
 function refreshSettings() {
-  chrome.storage.local.get(["running", "keep_subdomains", "disable_google_redirect", "remove_referer"], value => 
+  chrome.storage.local.get(["running", "keep_subdomains", "disable_google_redirect", "disable_twitter_redirect", "remove_referer"], value => 
   {
     isRunning = value["running"];
     keepSubdomains = value["keep_subdomains"];
     disableGoogleRedirect = value["disable_google_redirect"];
+    disableTwitterRedirect = value["disable_twitter_redirect"];
     removeReferer = value["remove_referer"];
   })
 }
