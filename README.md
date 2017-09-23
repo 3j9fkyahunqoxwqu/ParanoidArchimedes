@@ -11,6 +11,7 @@ A chrome extension for users who care about privacy.
 * Option: remove Google search results indirection
 * Option: remove Twitter link redirection
 * Shows stats for removed cookies
+* Remove `referer` header from HTTP headers
 
 ## TODOs
 * Storage option (if necessary)
