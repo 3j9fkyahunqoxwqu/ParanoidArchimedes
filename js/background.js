@@ -57,12 +57,12 @@ function removeCookies(tabURLs, keepSubdomain){
   var stats_array = [];
   tabURLs != null ? 
     chrome.cookies.getAllCookieStores(storeIds => { Array.prototype.map.call(storeIds, sId => { 
-      chrome.cookies.getAll({storeId: sId.id}, cookies => { console.log(cookies);
+      chrome.cookies.getAll({storeId: sId.id}, cookies => { 
         //cookie belongs to any open tabs? true => keep : false => remove
         cookies != null ? Array.prototype.map.call(cookies, cookie => { 
           isUseless(tabURLs, cookie.domain, keepSubdomain) ?
           ( isUseless(stats_array, cookie.domain, false) ? stats_array.push(trimURL(new URL('http://' + cookie.domain), true)) : null, 
-          chrome.cookies.remove({url: isSecure(cookie) + trimURL(new URL('http://' + cookie.domain), false) + cookie.path ,name: cookie.name, storeId: sId.id}, i => console.log("removing " + JSON.stringify(i))) )
+          chrome.cookies.remove({url: isSecure(cookie) + trimURL(new URL('http://' + cookie.domain), false) + cookie.path ,name: cookie.name, storeId: sId.id}) )
           : console.log("Will not remove --> " + cookie.domain);
         }) : null;
       }) 
