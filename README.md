@@ -6,7 +6,8 @@
 A chrome extension for users who care about privacy.
 
 ## Features
-* All closed-tab cookies are deleted when you close a tab or click on the extension's icon.
+* All closed-tab cookies are deleted when you close a tab.
+* All closed-tab storage data are deleted when you close a tab.
 * Option: domain and subdomain cookies of a website can be kept
 * Option: remove Google search results indirection
 * Option: remove Twitter link redirection
