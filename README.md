@@ -13,6 +13,7 @@ A chrome extension for users who care about privacy.
 * Option: remove Twitter link redirection
 * Shows stats for removed cookies
 * Remove `referer` header from HTTP headers
+* Remove `ping` attribute from anchor tags (anti-tracking)
 
 ## TODOs
 * Storage option (if necessary)
