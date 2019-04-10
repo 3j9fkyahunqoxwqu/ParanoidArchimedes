@@ -3,19 +3,20 @@
 //      Storage
 //   -->add more options to popup
 //      replace array with set
-//   -->disable twitter link redirect
 //      add secure flag to all https
+//   -->remove ping url attribute from anchors
 
 "use strict";
 
 // initialize global settings from storage
-chrome.storage.local.set({"running": true, "keep_list": [], "keep_subdomains": false, "disable_google_redirect": true, "disable_twitter_redirect": true, "remove_referer": true},);
+chrome.storage.local.set({"running": true, "keep_list": [], "keep_subdomains": false, "disable_google_redirect": true, "disable_twitter_redirect": true, "remove_referer": true, "remove_url_ping": true},);
 chrome.storage.local.get(["stats"], value => value["stats"] == null ? chrome.storage.local.set({"stats": Object()}) : null)
 var isRunning = true;
 var keepSubdomains = false
 var disableGoogleRedirect = true;
 var disableTwitterRedirect = true;
 var removeReferer = true;
+var removeUrlPing = true;
 
 const nuke_storage = `(async() => {
   try{
@@ -31,6 +32,19 @@ const nuke_storage = `(async() => {
   } catch (err) {
     console.log(err.message)
   }
+})();`;
+
+const nuke_ping = `(() => {
+    var script = document.createElement('script');
+    script.textContent = "document.addEventListener('DOMSubtreeModified', () => { \
+      var url_list = document.getElementsByTagName('a'); \
+      for (let url of url_list){ \
+        if (url.hasAttribute('ping')) \
+            url.removeAttribute('ping'); \
+      } \
+    });";
+    (document.body || document.documentElement).appendChild(script);
+    script.remove();
 })();`;
 
 //popup
@@ -58,6 +72,13 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
     : null;
   isIn(tab.url, 'twitter.com') && changeInfo.status === 'complete' && isRunning && disableTwitterRedirect ?
     chrome.tabs.executeScript({file: "js/content_script.js"})
+    : null;
+  // remove ping attribute from anchors
+  changeInfo.status === 'complete' && isRunning && removeUrlPing ?
+    chrome.tabs.executeScript({code: nuke_ping}, () =>{
+      // runtime.lastError
+        chrome.runtime.lastError !== undefined ? console.log(tab.id, tab.url, chrome.runtime.lastError.message) : null;
+      })
     : null;
 });
 
@@ -111,14 +132,17 @@ function removeCookies(tabURLs, keepSubdomain, tabs){
 }
 
 function refreshSettings() {
-  chrome.storage.local.get(["running", "keep_subdomains", "disable_google_redirect", "disable_twitter_redirect", "remove_referer"], value => 
+  chrome.storage.local.get(["running", "keep_subdomains", "disable_google_redirect", "disable_twitter_redirect", "remove_referer", "remove_url_ping"], value => 
   {
     isRunning = value["running"];
     keepSubdomains = value["keep_subdomains"];
     disableGoogleRedirect = value["disable_google_redirect"];
     disableTwitterRedirect = value["disable_twitter_redirect"];
     removeReferer = value["remove_referer"];
-  })
+    removeUrlPing = value["remove_url_ping"];
+  });
+  // reload page
+  chrome.tabs.reload();
 }
 
 function isUseless(urls, cookieDomain, keepSubdomain){

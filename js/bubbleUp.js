@@ -3,7 +3,7 @@
 
 window.addEventListener('load', () => {
     //get current state from storage
-    chrome.storage.local.get(["running", "keep_list", "keep_subdomains", "disable_google_redirect", "disable_twitter_redirect", "remove_referer"], value => {
+    chrome.storage.local.get(["running", "keep_list", "keep_subdomains", "disable_google_redirect", "disable_twitter_redirect", "remove_referer", "remove_url_ping"], value => {
         //running? 
         document.getElementById('control-button').innerText = (value['running'] ? "Pause" : "Resume Paranoia");
         //keep cookie list?
@@ -19,6 +19,8 @@ window.addEventListener('load', () => {
         value["disable_twitter_redirect"] != null ? document.getElementById('disable-twitter-redirect').checked = value["disable_twitter_redirect"] : null;
         //remove referer header?
         value["remove_referer"] != null ? document.getElementById('remove-referer').checked = value["remove_referer"] : null;
+        //remove url ping
+        value["remove_url_ping"] != null ? document.getElementById('remove-url-ping').checked = value["remove_url_ping"] : null;
     });
         
     //get stats
@@ -58,6 +60,8 @@ function saveSettings() {
     saveToStorage("disable_twitter_redirect", document.getElementById('disable-twitter-redirect').checked, false, false); 
     //if checked true --> remove referer
     saveToStorage("remove_referer", document.getElementById('remove-referer').checked, false, false);
+    //if checked true --> remove url ping
+    saveToStorage("remove_url_ping", document.getElementById('remove-url-ping').checked, false, false);
     controlCommand("settings");
 }
 
